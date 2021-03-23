@@ -1,45 +1,43 @@
+// input -> url
+// output -> all url print
 let request = require("request");
 let cheerio = require("cheerio");
-let MatchRef = require("./match.js");
+let scorecardObj = require("./scorecard");
+console.log("Inside All Match");
 
-
-function processAllMatch(url) {
-    request(url, cb);
+function processAllmatch(url){
+  // request link extract
+   request(url, cb);
+   function cb(err, res, html) {
+       if(err) {
+           console.log(err);
+       }
+       else {
+           extractAllScorecardLink(html);
+       }
+   }
 }
 
-function cb(error,response,html) {
-    if(error) {
-        console.log(error);
-    }
-
-    else {
-        extracthtml(html);
-    }
-}
-
-
-function extracthtml(html) {
-    let ch = cheerio.load(html);
-    let cards = ch(".col-md-8.col-16");
-    console.log(cards.length)
-    for(let i = 0; i < cards.length; i++) {
-        let anchorTagArray = ch(cards[i]).find(".match-cta-container a");
-        let links = ch(anchorTagArray[2]).attr("href");
-        //console.log(links);
-        let completeLink = "https://www.espncricinfo.com" + links;
-        //console.log(completeLink);
-        MatchRef.processMatch(completeLink);
-
-    }
-
-    
+function extractAllScorecardLink(html) {
+    let seltool = cheerio.load(html);
+    let scorecardlinkArr = seltool("a[data-hover='Scorecard']");
    
+    console.log(scorecardlinkArr.length);
+    for(let i =0; i < scorecardlinkArr.length; i++) {
+        let link = seltool(scorecardlinkArr[i]).attr("href");
+        let fullLink = "https://www.espncricinfo.com" + link;
+        console.log(fullLink);
+        scorecardObj.processSingleMatch(fullLink);
+    }
 }
+
+
+
 
 
 
 
 
 module.exports = {
-    processAllMatch: processAllMatch
+    pam: processAllmatch
 }
